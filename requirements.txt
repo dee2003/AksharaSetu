@@ -114,7 +114,6 @@ pyngrok==7.1.6
 pyparsing==3.1.2
 PySocks==1.7.1
 pytesseract==0.3.10
-python==3.11.3
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-json-logger==2.0.7
@@ -146,7 +145,6 @@ tenacity==8.4.0
 tensorboard==2.16.2
 tensorboard-data-server==0.7.2
 tensorflow==2.16.1
-tensorflow-intel==2.16.1
 tensorflow-io-gcs-filesystem==0.31.0
 termcolor==2.4.0
 terminado==0.18.1
