@@ -11,7 +11,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 # Define image dimensions and paths
 img_height, img_width = 150, 150
 batch_size = 32
-data_dir = 'D:\\Tulu_lipi\\dataset'
+data_dir =r'D:\\Tulu_lipi\\dataset'
 
 # Data augmentation and normalization
 train_datagen = ImageDataGenerator(
