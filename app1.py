@@ -15,10 +15,16 @@ model = load_model('tulu_character_recognition_model2.h5')
 # Define the class indices (these should match your trained model)
 # Example: class_indices = {'class1': 0, 'class2': 1, ...}
 class_indices = {
-    0: 'Kannada_folder1',
-    1: 'Kannada_folder2',
-    2: 'Kannada_folder3',
-    # Add all the folder mappings based on your trained model
+    'ಅ': 1, 'ಆ': 2, 'ಇ': 3, 'ಈ': 4, 'ಉ': 5,
+    'ಊ': 6, 'ಋ': 7, 'ೠ': 8, 'ಎ': 9, 'ಏ': 10,
+    'ಐ': 11, 'ಒ': 12, 'ಔ': 13, 'ಅಂ': 14, 'ಅಃ': 15,
+    'ಕ': 16, 'ಖ': 17, 'ಗ': 18, 'ಘ': 19, 'ಙ': 20,
+    'ಚ': 21, 'ಛ': 22, 'ಜ': 23, 'ಝ': 24, 'ಞ': 25,
+    'ಟ': 26, 'ಠ': 27, 'ಡ': 28, 'ಢ': 29, 'ಣ': 30,
+    'ತ': 31, 'ಥ': 32, 'ದ': 33, 'ಧ': 34, 'ನ': 35,
+    'ಪ': 36, 'ಫ': 37, 'ಬ': 38, 'ಭ': 39, 'ಮ': 40,
+    'ಯ': 41, 'ರ': 42, 'ಲ': 43, 'ವ': 44, 'ಶ': 45,
+    'ಷ': 46, 'ಸ': 47, 'ಹ': 48, 'ಳ': 49
 }
 
 # Function to load and preprocess an image
