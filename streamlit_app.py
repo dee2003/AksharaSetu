@@ -37,6 +37,7 @@ if not os.path.exists(zip_file_path):
         st.error(f"Error downloading dataset: {e}")
 
 # Unzip the dataset
+# Unzip the dataset
 temp_dir = "temp_dataset"
 if not os.path.exists(temp_dir):
     os.makedirs(temp_dir)
@@ -44,12 +45,24 @@ if not os.path.exists(temp_dir):
 try:
     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
         zip_ref.extractall(temp_dir)
+    
+    # Debugging: List files in the extracted directory
+    extracted_files = os.listdir(temp_dir)
+    st.write("Extracted files:", extracted_files)
+    
     st.success("Dataset unzipped successfully!")
 except zipfile.BadZipFile as e:
     st.error(f"Error unzipping dataset: {e}")
 
-# Set the path to the unzipped dataset
-dataset_path = os.path.join(temp_dir, "resize2")  # Adjust this to the correct folder name
+# Adjust the dataset path based on the output of extracted files
+dataset_path = os.path.join(temp_dir, "resize2")  # Update this based on actual folder structure
+
+# Check if dataset_path exists after modification
+if not os.path.exists(dataset_path):
+    st.error(f"Dataset directory {dataset_path} not found!")
+else:
+    st.success(f"Dataset found at {dataset_path}")
+
 
 # Load model and generator setup
 datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
