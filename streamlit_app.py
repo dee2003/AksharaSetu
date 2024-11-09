@@ -14,9 +14,9 @@ confidence_threshold = 0.7
 
 # Define temporary directory for dataset
 dataset_url = "https://github.com/dee2003/Tulu-to-Kannada-TransCoder/releases/download/v1.0/dataset.zip"  # Replace with actual GitHub release URL
-dataset_dir = "/tmp/dataset"
+dataset_dir = "/tmp/dataset"  # This should be consistent across your code
 
-# Download and extract dataset if not already done
+# Verify if the dataset directory exists after extraction
 if not os.path.exists(dataset_dir):
     os.makedirs(dataset_dir, exist_ok=True)
     response = requests.get(dataset_url)
@@ -25,7 +25,10 @@ if not os.path.exists(dataset_dir):
     with zipfile.ZipFile("/tmp/dataset.zip", "r") as zip_ref:
         zip_ref.extractall(dataset_dir)
 
-# Setup data generator with the downloaded dataset
+# Print the contents of the dataset directory to verify
+print("Dataset directory contains:", os.listdir(dataset_dir))
+
+# Continue with loading the data
 datagen = ImageDataGenerator(rescale=1.0 / 255, validation_split=0.2)
 train_generator = datagen.flow_from_directory(
     dataset_dir,
@@ -40,7 +43,7 @@ train_generator = datagen.flow_from_directory(
 
 # Load model
 try:
-    model = load_model("tulu_character_recognition_model2.h5")
+    model ="tulu_character_recognition_model2.h5"
     model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
 except Exception as e:
     st.error(f"Could not load model: {e}")
