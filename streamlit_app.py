@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import zipfile
+import streamlit_canvas
 import os
 from PIL import Image
 from tensorflow.keras.models import load_model
