@@ -41,13 +41,21 @@ train_generator = datagen.flow_from_directory(
     seed=42,
 )
 
-# Load model
+model_url = "https://raw.githubusercontent.com/dee2003/Tulu-to-Kannada-TransCoder/main/tulu_character_recognition_model2.h5"
+response = requests.get(model_url)
+
+# Save the model file to a temporary location
+with open("tulu_character_recognition_model2.h5", "wb") as f:
+    f.write(response.content)
+
+# Now load the model from the saved file
 try:
     model = load_model("tulu_character_recognition_model2.h5")
     model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
 except Exception as e:
     st.error(f"Could not load model: {e}")
     st.stop()
+
 
 # Map class indices
 class_indices = train_generator.class_indices
