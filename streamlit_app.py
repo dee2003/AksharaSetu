@@ -43,7 +43,7 @@ train_generator = datagen.flow_from_directory(
 
 # Load model
 try:
-    model ="tulu_character_recognition_model2.h5"
+    model = load_model("tulu_character_recognition_model2.h5")
     model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
 except Exception as e:
     st.error(f"Could not load model: {e}")
