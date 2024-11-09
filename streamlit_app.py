@@ -60,10 +60,10 @@ train_generator = datagen.flow_from_directory(
 # Load model
 try:
     model = load_model("tulu_character_recognition_model2.h5")
-    model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
 except Exception as e:
-    st.error(f"Could not load model: {e}")
+    st.error(f"Error loading model: {e}")
     st.stop()
+
 
 # Map class indices
 class_indices = train_generator.class_indices
