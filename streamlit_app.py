@@ -10,6 +10,7 @@ import os
 import zipfile
 from gtts import gTTS
 from io import BytesIO
+import pyttsx3  # Missing import for pyttsx3
 
 # Set page config with a larger layout
 st.set_page_config(page_title="AksharaSetu", layout="wide")
@@ -26,18 +27,26 @@ zip_file_path = "dataset.zip"
 
 # Download the dataset
 if not os.path.exists(zip_file_path):
-    response = requests.get(dataset_url)
-    with open(zip_file_path, "wb") as f:
-        f.write(response.content)
-    st.success("Dataset downloaded successfully!")
+    try:
+        response = requests.get(dataset_url)
+        response.raise_for_status()  # Raises an error for bad responses
+        with open(zip_file_path, "wb") as f:
+            f.write(response.content)
+        st.success("Dataset downloaded successfully!")
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error downloading dataset: {e}")
 
 # Unzip the dataset
 temp_dir = "temp_dataset"
 if not os.path.exists(temp_dir):
     os.makedirs(temp_dir)
 
-with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-    zip_ref.extractall(temp_dir)
+try:
+    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+        zip_ref.extractall(temp_dir)
+    st.success("Dataset unzipped successfully!")
+except zipfile.BadZipFile as e:
+    st.error(f"Error unzipping dataset: {e}")
 
 # Set the path to the unzipped dataset
 dataset_path = os.path.join(temp_dir, "resize2")  # Adjust this to the correct folder name
@@ -61,10 +70,14 @@ model_url = 'https://github.com/dee2003/Tulu-to-Kannada-TransCoder/blob/main/tul
 # Check if model exists, otherwise download
 if not os.path.exists(model_path):
     st.info("Downloading model, please wait...")
-    response = requests.get(model_url)
-    with open(model_path, 'wb') as f:
-        f.write(response.content)
-    st.success("Model downloaded successfully!")
+    try:
+        response = requests.get(model_url)
+        response.raise_for_status()  # Raises an error for bad responses
+        with open(model_path, 'wb') as f:
+            f.write(response.content)
+        st.success("Model downloaded successfully!")
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error downloading model: {e}")
 
 # Load model with error handling
 try:
@@ -73,7 +86,6 @@ try:
 except Exception as e:
     st.error("An error occurred while loading the model.")
     st.text(f"Error details: {e}")
-
 
 class_indices = train_generator.class_indices
 index_to_class = {v: k for k, v in class_indices.items()}
@@ -112,10 +124,6 @@ def show_instructions():
     </div>
     """, unsafe_allow_html=True)
 
-
-
-
-
 # Create two columns for a better UI layout
 col1, col2 = st.columns([2, 1])  # Adjust the width ratio for UI
 
@@ -134,7 +142,6 @@ with col1:
     """, unsafe_allow_html=True
 )
 
-
     # Additional content or features can be added here (e.g., instructions button)
     if st.button("🛈 Instructions"):
         show_instructions()
@@ -152,6 +159,8 @@ with col1:
         key="canvas_1",
     )
 
+    if st.button('Clear Canvas'):
+        st.session_state.canvas_result = None  # Clears the canvas
 
 # Prediction based on the drawn character
 if canvas_result.image_data is not None:
@@ -164,8 +173,7 @@ if canvas_result.image_data is not None:
         
         if confidence >= confidence_threshold:
             predicted_character = index_to_class.get(predicted_class, "Unknown")
-            st.markdown(f"<p style='font-size:25px; color:#2e4a77; font-weight:bold;'>Predicted kannada Character: {predicted_character}</p>", unsafe_allow_html=True)
-            
-            
+            st.markdown(f"<p style='font-size:25px; color:#2e4a77; font-weight:bold;'>Predicted Kannada Character: {predicted_character}</p>", unsafe_allow_html=True)
+            speak(predicted_character, lang='kn')  # Speaking the Kannada prediction
         else:
             st.markdown("<p style='font-size:25px; color:red; font-weight:bold;'>Unrecognized Character</p>", unsafe_allow_html=True)
