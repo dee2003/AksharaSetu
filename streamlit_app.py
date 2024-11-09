@@ -56,7 +56,7 @@ train_generator = datagen.flow_from_directory(
 )
 
 model_path = 'tulu_character_recognition_model2.h5'
-model_url = 'https://github.com/manishak8089/VarnaMithra-Tulu_to_Multilingual_Translation/releases/download/v1.0/tulu_character_recognition_model2.h5'
+model_url = 'https://github.com/dee2003/Tulu-to-Kannada-TransCoder/blob/main/tulu_character_recognition_model2.h5'
 
 # Check if model exists, otherwise download
 if not os.path.exists(model_path):
