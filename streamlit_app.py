@@ -44,17 +44,20 @@ train_generator = datagen.flow_from_directory(
 model_url = "https://raw.githubusercontent.com/dee2003/Tulu-to-Kannada-TransCoder/main/tulu_character_recognition_model2.h5"
 response = requests.get(model_url)
 
-# Save the model file to a temporary location
-with open("tulu_character_recognition_model2.h5", "wb") as f:
-    f.write(response.content)
+# Check if the download was successful
+if response.status_code == 200:
+    with open("tulu_character_recognition_model2.h5", "wb") as f:
+        f.write(response.content)
 
-# Now load the model from the saved file
-try:
-    model = load_model("tulu_character_recognition_model2.h5")
-    model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
-except Exception as e:
-    st.error(f"Could not load model: {e}")
-    st.stop()
+    try:
+        model = load_model("tulu_character_recognition_model2.h5")
+        model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
+    except Exception as e:
+        st.error(f"Could not load model: {e}")
+        st.stop()
+else:
+    st.error("Failed to download the model file.")
+
 
 
 # Map class indices
