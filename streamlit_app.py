@@ -19,8 +19,7 @@ img_height, img_width = 150, 150
 batch_size = 32
 confidence_threshold = 0.7
 
-dataset_url = "https://github.com/https://github.com/dee2003/Tulu-to-Kannada-TransCoder/releases/download/v2.0/dataset.zip"
-
+dataset_url = 'https://github.com/dee2003/Varnamitra-Tulu-word-translation/releases/download/v1.0/dataset.zip'
 # File path to save the downloaded dataset
 zip_file_path = "dataset.zip"
 
