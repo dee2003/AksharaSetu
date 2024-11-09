@@ -1,75 +1,83 @@
 import streamlit as st
-import requests
-import zipfile
-import os
+from streamlit_drawable_canvas import st_canvas
 from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, ImageDataGenerator
 import numpy as np
-import pyttsx3
+import pandas as pd
+import requests
+import os
+import zipfile
 from gtts import gTTS
 from io import BytesIO
-from streamlit_drawable_canvas import st_canvas
 
+# Set page config with a larger layout
+st.set_page_config(page_title="AksharaSetu", layout="wide")
 
 # Define image dimensions
 img_height, img_width = 150, 150
 batch_size = 32
 confidence_threshold = 0.7
 
-# Define temporary directory for dataset
-dataset_url = "https://github.com/dee2003/Tulu-to-Kannada-TransCoder/releases/download/v1.0/dataset.zip"  # Replace with actual GitHub release URL
-dataset_dir = "/tmp/dataset"
+dataset_url = "https://github.com/dee2003/Tulu-to-Kannada-TransCoder/releases/tag/v1.0/dataset.zip"  # Replace with actual GitHub release URL
 
-# Download and extract dataset if not already done
-if not os.path.exists(dataset_dir):
-    os.makedirs(dataset_dir, exist_ok=True)
-    
-    # Download the dataset
+# File path to save the downloaded dataset
+zip_file_path = "dataset.zip"
+
+# Download the dataset
+if not os.path.exists(zip_file_path):
     response = requests.get(dataset_url)
-    
-    if response.status_code == 200:
-        with open("/tmp/dataset.zip", "wb") as f:
-            f.write(response.content)
-    else:
-        st.error("Failed to download the dataset. HTTP Status Code: {}".format(response.status_code))
-        st.stop()
-    
-    # Verify and extract the ZIP file
-    try:
-        with zipfile.ZipFile("/tmp/dataset.zip", "r") as zip_ref:
-            zip_ref.testzip()  # Check the integrity of the ZIP file
-            zip_ref.extractall(dataset_dir)
-    except zipfile.BadZipFile:
-        st.error("The downloaded file is not a valid ZIP file.")
-        st.stop()
+    with open(zip_file_path, "wb") as f:
+        f.write(response.content)
+    st.success("Dataset downloaded successfully!")
 
-# Setup data generator with the downloaded dataset
-datagen = ImageDataGenerator(rescale=1.0 / 255, validation_split=0.2)
+# Unzip the dataset
+temp_dir = "temp_dataset"
+if not os.path.exists(temp_dir):
+    os.makedirs(temp_dir)
+
+with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+    zip_ref.extractall(temp_dir)
+
+# Set the path to the unzipped dataset
+dataset_path = os.path.join(temp_dir, "resize2")  # Adjust this to the correct folder name
+
+# Load model and generator setup
+datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
 train_generator = datagen.flow_from_directory(
-    dataset_dir,
+    dataset_path,
     target_size=(img_height, img_width),
-    color_mode="grayscale",
-    class_mode="categorical",
+    color_mode='grayscale',
+    class_mode='categorical',
     batch_size=batch_size,
-    subset="training",
+    subset='training',
     shuffle=True,
     seed=42,
 )
 
-# Load model
+model_path = 'tulu_character_recognition_model2.h5'
+model_url = 'https://github.com/manishak8089/VarnaMithra-Tulu_to_Multilingual_Translation/releases/download/v1.0/tulu_character_recognition_model2.h5'
+
+# Check if model exists, otherwise download
+if not os.path.exists(model_path):
+    st.info("Downloading model, please wait...")
+    response = requests.get(model_url)
+    with open(model_path, 'wb') as f:
+        f.write(response.content)
+    st.success("Model downloaded successfully!")
+
+# Load model with error handling
 try:
-    model = load_model("tulu_character_recognition_model2.h5")
+    model = load_model(model_path)
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 except Exception as e:
-    st.error(f"Error loading model: {e}")
-    st.stop()
+    st.error("An error occurred while loading the model.")
+    st.text(f"Error details: {e}")
 
 
-# Map class indices
 class_indices = train_generator.class_indices
 index_to_class = {v: k for k, v in class_indices.items()}
 
-# Function to preprocess images
 def preprocess_image(img):
     img = img.convert("L")
     img = img.resize((img_width, img_height))
@@ -78,8 +86,6 @@ def preprocess_image(img):
     img_array = np.repeat(img_array, 3, axis=-1)
     img_array /= 255.0
     return img_array
-
-# The rest of your Streamlit app code (e.g., canvas drawing, prediction, UI elements) follows here...
 
 def is_image_blank(image_data):
     return np.all(image_data[:, :, 0] == 0) or np.all(image_data[:, :, 0] == 255)
@@ -108,8 +114,7 @@ def show_instructions():
 
 
 
-# Set page config with a larger layout
-st.set_page_config(page_title="AksharaSetu", layout="wide")
+
 
 # Create two columns for a better UI layout
 col1, col2 = st.columns([2, 1])  # Adjust the width ratio for UI
@@ -159,7 +164,7 @@ if canvas_result.image_data is not None:
         
         if confidence >= confidence_threshold:
             predicted_character = index_to_class.get(predicted_class, "Unknown")
-            st.markdown(f"<p style='font-size:25px; color:#2e4a77; font-weight:bold;'>Predicted Character: {predicted_character}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size:25px; color:#2e4a77; font-weight:bold;'>Predicted kannada Character: {predicted_character}</p>", unsafe_allow_html=True)
             
             
         else:
