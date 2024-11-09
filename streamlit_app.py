@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 import zipfile
-import streamlit_canvas
 import os
 from PIL import Image
 from tensorflow.keras.models import load_model
@@ -10,7 +9,8 @@ import numpy as np
 import pyttsx3
 from gtts import gTTS
 from io import BytesIO
-from streamlit_canvas import st_canvas
+from streamlit_drawable_canvas import st_canvas
+
 
 # Define image dimensions
 img_height, img_width = 150, 150
