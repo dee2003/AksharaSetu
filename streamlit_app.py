@@ -53,7 +53,7 @@ except Exception as e:
 
 
 # Adjust the dataset path based on the output of extracted files
-dataset_path = os.path.join(temp_dir, "resize2")  # Update this based on actual folder structure
+dataset_path = os.path.join(temp_dir, "dataset")  # Update this based on actual folder structure
 
 # Check if dataset_path exists after modification
 if not os.path.exists(dataset_path):
