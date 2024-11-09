@@ -20,7 +20,7 @@ img_height, img_width = 150, 150
 batch_size = 32
 confidence_threshold = 0.7
 
-dataset_url = "https://github.com/dee2003/Tulu-to-Kannada-TransCoder/releases/download/v1.0/dataset.zip"  # Use the correct URL for the raw zip file
+dataset_url = "https://github.com/dee2003/Tulu-to-Kannada-TransCoder/releases/v1.0"  # Use the correct URL for the raw zip file
   # Replace with actual GitHub release URL
 
 # File path to save the downloaded dataset
@@ -38,7 +38,6 @@ if not os.path.exists(zip_file_path):
         st.error(f"Error downloading dataset: {e}")
 
 # Unzip the dataset
-# Unzip the dataset
 temp_dir = "temp_dataset"
 if not os.path.exists(temp_dir):
     os.makedirs(temp_dir)
@@ -46,14 +45,12 @@ if not os.path.exists(temp_dir):
 try:
     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
         zip_ref.extractall(temp_dir)
-    
-    # Debugging: List files in the extracted directory
-    extracted_files = os.listdir(temp_dir)
-    st.write("Extracted files:", extracted_files)
-    
     st.success("Dataset unzipped successfully!")
-except zipfile.BadZipFile as e:
-    st.error(f"Error unzipping dataset: {e}")
+except zipfile.BadZipFile:
+    st.error(f"The file {zip_file_path} is not a valid zip file.")
+except Exception as e:
+    st.error(f"An error occurred: {e}")
+
 
 # Adjust the dataset path based on the output of extracted files
 dataset_path = os.path.join(temp_dir, "resize2")  # Update this based on actual folder structure
