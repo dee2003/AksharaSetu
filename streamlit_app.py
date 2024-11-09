@@ -6,6 +6,10 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, ImageDataGenerator
 import numpy as np
+import pyttsx3
+from gtts import gTTS
+from io import BytesIO
+from streamlit_canvas import st_canvas
 
 # Define image dimensions
 img_height, img_width = 150, 150
@@ -13,17 +17,31 @@ batch_size = 32
 confidence_threshold = 0.7
 
 # Define temporary directory for dataset
-dataset_url = "https://github.com/dee2003/Tulu-to-Kannada-TransCoder/releases/tag/v1.0/dataset.zip"  # Replace with actual GitHub release URL
+dataset_url = "https://github.com/dee2003/Tulu-to-Kannada-TransCoder/releases/download/v1.0/dataset.zip"  # Replace with actual GitHub release URL
 dataset_dir = "/tmp/dataset"
 
 # Download and extract dataset if not already done
 if not os.path.exists(dataset_dir):
     os.makedirs(dataset_dir, exist_ok=True)
+    
+    # Download the dataset
     response = requests.get(dataset_url)
-    with open("/tmp/dataset.zip", "wb") as f:
-        f.write(response.content)
-    with zipfile.ZipFile("/tmp/dataset.zip", "r") as zip_ref:
-        zip_ref.extractall(dataset_dir)
+    
+    if response.status_code == 200:
+        with open("/tmp/dataset.zip", "wb") as f:
+            f.write(response.content)
+    else:
+        st.error("Failed to download the dataset. HTTP Status Code: {}".format(response.status_code))
+        st.stop()
+    
+    # Verify and extract the ZIP file
+    try:
+        with zipfile.ZipFile("/tmp/dataset.zip", "r") as zip_ref:
+            zip_ref.testzip()  # Check the integrity of the ZIP file
+            zip_ref.extractall(dataset_dir)
+    except zipfile.BadZipFile:
+        st.error("The downloaded file is not a valid ZIP file.")
+        st.stop()
 
 # Setup data generator with the downloaded dataset
 datagen = ImageDataGenerator(rescale=1.0 / 255, validation_split=0.2)
