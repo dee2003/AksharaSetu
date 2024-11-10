@@ -59,7 +59,7 @@ import os
 
 # Define function to download model with error handling
 def download_model():
-    model_url = 'https://github.com/dee2003/Tulu-to-Kannada-TransCoder/raw/main/tulu_character_recognition_model2.h5'
+    model_url = 'https://github.com/dee2003/Varnamitra-Tulu-word-translation/releases/download/v1.0/tulu_character_recognition_model2.h5'
     model_path = 'tulu_character_recognition_model2.h5'
     
     if not os.path.exists(model_path) or os.path.getsize(model_path) < 1000:  # File size check
