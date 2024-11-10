@@ -55,6 +55,9 @@ train_generator = datagen.flow_from_directory(
     seed=42,
 )
 
+model_path = 'tulu_character_recognition_model2.h5'
+model_url = 'https://github.com/dee2003/Varnamitra-Tulu-word-translation/releases/download/v1.0/tulu_character_recognition_model2.h5'
+
 # Check if model exists, otherwise download
 if not os.path.exists(model_path):
     st.info("Downloading model, please wait...")
