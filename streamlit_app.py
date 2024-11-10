@@ -55,28 +55,38 @@ train_generator = datagen.flow_from_directory(
     seed=42,
 )
 
-model_path = 'tulu_character_recognition_model2.h5'
-model_url = 'https://github.com/dee2003/Tulu-to-Kannada-TransCoder/blob/main/tulu_character_recognition_model2.h5'
+import os
 
-if not os.path.exists(model_path):
+# Define function to download model with error handling
+def download_model():
+    model_url = 'https://github.com/dee2003/Tulu-to-Kannada-TransCoder/raw/main/tulu_character_recognition_model2.h5'
+    model_path = 'tulu_character_recognition_model2.h5'
+    
+    if not os.path.exists(model_path) or os.path.getsize(model_path) < 1000:  # File size check
+        try:
+            response = requests.get(model_url)
+            response.raise_for_status()  # Ensure there is no download error
+            with open(model_path, 'wb') as f:
+                f.write(response.content)
+            st.success("Model downloaded successfully.")
+        except requests.exceptions.RequestException as e:
+            st.error(f"Error downloading the model: {e}")
+            return None
+    return model_path
+
+model_path = download_model()
+
+# Load the model if it exists
+if model_path and os.path.exists(model_path):
     try:
-        # Download model if not already present
-        response = requests.get(model_url)
-        response.raise_for_status()  # Check for request errors
-        with open(model_path, 'wb') as f:
-            f.write(response.content)
-        print("Model downloaded successfully.")
-    except requests.exceptions.RequestException as e:
-        print(f"Error downloading the model: {e}")
-        raise
+        model = load_model(model_path)
+        st.success("Model loaded successfully.")
+    except Exception as e:
+        st.error(f"Error loading the model: {e}")
+        model = None
+else:
+    model = None
 
-# Load model setup
-try:
-    model = load_model('tulu_character_recognition_model2.h5')
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-except Exception as e:
-    st.error(f"Could not load model: {e}")
-    st.stop()
 
 
 class_indices = train_generator.class_indices
