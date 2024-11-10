@@ -70,13 +70,13 @@ if not os.path.exists(model_path):
         print(f"Error downloading the model: {e}")
         raise
 
+# Load model setup
 try:
-    model = load_model(model_path)
-    st.success("Model loaded successfully.")
+    model = load_model('tulu_character_recognition_model2.h5')
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 except Exception as e:
-    st.error("Failed to load the model. Please check the model file or try again later.")
-    st.write(f"Error details: {e}")
-    model = None
+    st.error(f"Could not load model: {e}")
+    st.stop()
 
 
 class_indices = train_generator.class_indices
