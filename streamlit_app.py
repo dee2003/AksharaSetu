@@ -19,69 +19,61 @@ img_height, img_width = 150, 150
 batch_size = 32
 confidence_threshold = 0.7
 
-dataset_url = 'https://github.com/dee2003/Varnamitra-Tulu-word-translation/releases/download/v1.0/dataset.zip'
-dataset_zip_path = 'dataset.zip'
-dataset_dir = 'dataset'  # Directory to extract dataset contents
+dataset_url = "https://github.com/dee2003/Varnamitra-Tulu-word-translation/releases/download/v1.0/dataset.zip"
 
-# Download and extract dataset if not already extracted
-if not os.path.exists(dataset_dir):
-    if not os.path.exists(dataset_zip_path):
-        st.info("Downloading dataset, please wait...")
-        download_file(dataset_url, dataset_zip_path)
-        st.success("Dataset downloaded successfully!")
+# File path to save the downloaded dataset
+zip_file_path = "dataset.zip"
 
-    if zipfile.is_zipfile(dataset_zip_path):
-        st.info("Extracting dataset...")
-        with zipfile.ZipFile(dataset_zip_path, 'r') as zip_ref:
-            zip_ref.extractall(dataset_dir)
-        st.success("Dataset extracted successfully!")
-    else:
-        st.error("The dataset file is corrupted or not a valid zip file.")
+# Download the dataset
+if not os.path.exists(zip_file_path):
+    response = requests.get(dataset_url)
+    with open(zip_file_path, "wb") as f:
+        f.write(response.content)
+    st.success("Dataset downloaded successfully!")
 
-# Verify dataset structure
-if os.path.exists(dataset_dir) and len(os.listdir(dataset_dir)) > 0:
-    # Ensure there are subdirectories in dataset_dir for each class
-    subdirs = [d for d in os.listdir(dataset_dir) if os.path.isdir(os.path.join(dataset_dir, d))]
-    if subdirs:
-        st.success("Dataset structure verified.")
+# Unzip the dataset
+temp_dir = "temp_dataset"
+if not os.path.exists(temp_dir):
+    os.makedirs(temp_dir)
 
-        # Set up ImageDataGenerator
-        datagen = ImageDataGenerator(rescale=1./255)
-        try:
-            train_generator = datagen.flow_from_directory(
-                dataset_dir,
-                target_size=(150, 150),  # Adjust target size as per model input
-                batch_size=32,
-                class_mode='categorical'
-            )
-            st.success("Data generator created successfully.")
-        except Exception as e:
-            st.error(f"Error creating data generator: {e}")
-    else:
-        st.error("The dataset directory does not contain class subdirectories.")
-else:
-    st.error("Dataset directory is empty or does not exist.")
+with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+    zip_ref.extractall(temp_dir)
 
+# Set the path to the unzipped dataset
+dataset_path = os.path.join(temp_dir, "resize2")  # Adjust this to the correct folder name
+
+# Load model and generator setup
+datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
+train_generator = datagen.flow_from_directory(
+    dataset_path,
+    target_size=(img_height, img_width),
+    color_mode='grayscale',
+    class_mode='categorical',
+    batch_size=batch_size,
+    subset='training',
+    shuffle=True,
+    seed=42,
+)
 
 model_path = 'tulu_character_recognition_model2.h5'
 model_url = 'https://github.com/dee2003/Varnamitra-Tulu-word-translation/releases/download/v1.0/tulu_character_recognition_model2.h5'
 
-
 # Check if model exists, otherwise download
+if not os.path.exists(model_path):
+    st.info("Downloading model, please wait...")
+    response = requests.get(model_url)
+    with open(model_path, 'wb') as f:
+        f.write(response.content)
+    st.success("Model downloaded successfully!")
+
+# Load model with error handling
 try:
-    # Check if the model file exists before trying to load
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"Model file does not exist at path: {model_path}")
-    
     model = load_model(model_path)
-    st.success("Model loaded successfully.")
-    print("Model loaded successfully.")  # Logging to console for debugging
-except FileNotFoundError as e:
-    st.error(f"Error: {e}")
-    print(f"Error: {e}")  # Log the error to console
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 except Exception as e:
-    st.error(f"Error loading the model: {e}")
-    print(f"Error loading the model: {e}")  # Log the error to conso
+    st.error("An error occurred while loading the model.")
+    st.text(f"Error details: {e}")
+
 
 class_indices = train_generator.class_indices
 index_to_class = {v: k for k, v in class_indices.items()}
@@ -177,4 +169,3 @@ if canvas_result.image_data is not None:
             
         else:
             st.markdown("<p style='font-size:25px; color:red; font-weight:bold;'>Unrecognized Character</p>", unsafe_allow_html=True)
-
