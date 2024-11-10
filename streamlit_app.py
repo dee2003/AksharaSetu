@@ -64,7 +64,7 @@ else:
 
 
 model_path = 'tulu_character_recognition_model2.h5'
-model_url = 'https://github.com/dee2003/Tulu-to-Kannada-TransCoder/main/tulu_character_recognition_model2.h5'
+model_url = 'https://github.com/dee2003/Varnamitra-Tulu-word-translation/releases/download/v1.0/tulu_character_recognition_model2.h5'
 
 # Check if model exists, otherwise download
 if not os.path.exists(model_path):
