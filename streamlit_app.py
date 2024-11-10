@@ -55,38 +55,21 @@ train_generator = datagen.flow_from_directory(
     seed=42,
 )
 
-import os
+# Check if model exists, otherwise download
+if not os.path.exists(model_path):
+    st.info("Downloading model, please wait...")
+    response = requests.get(model_url)
+    with open(model_path, 'wb') as f:
+        f.write(response.content)
+    st.success("Model downloaded successfully!")
 
-# Define function to download model with error handling
-def download_model():
-    model_url = 'https://github.com/dee2003/Varnamitra-Tulu-word-translation/releases/download/v1.0/tulu_character_recognition_model2.h5'
-    model_path = 'tulu_character_recognition_model2.h5'
-    
-    if not os.path.exists(model_path) or os.path.getsize(model_path) < 1000:  # File size check
-        try:
-            response = requests.get(model_url)
-            response.raise_for_status()  # Ensure there is no download error
-            with open(model_path, 'wb') as f:
-                f.write(response.content)
-            st.success("Model downloaded successfully.")
-        except requests.exceptions.RequestException as e:
-            st.error(f"Error downloading the model: {e}")
-            return None
-    return model_path
-
-model_path = download_model()
-
-# Load the model if it exists
-if model_path and os.path.exists(model_path):
-    try:
-        model = load_model(model_path)
-        st.success("Model loaded successfully.")
-    except Exception as e:
-        st.error(f"Error loading the model: {e}")
-        model = None
-else:
-    model = None
-
+# Load model with error handling
+try:
+    model = load_model(model_path)
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+except Exception as e:
+    st.error("An error occurred while loading the model.")
+    st.text(f"Error details: {e}")
 
 
 class_indices = train_generator.class_indices
