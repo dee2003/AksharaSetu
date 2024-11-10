@@ -70,12 +70,13 @@ if not os.path.exists(model_path):
         print(f"Error downloading the model: {e}")
         raise
 
-# Load the model
 try:
     model = load_model(model_path)
-    print("Model loaded successfully.")
+    st.success("Model loaded successfully.")
 except Exception as e:
-    print(f"Error loading the model: {e}")
+    st.error("Failed to load the model. Please check the model file or try again later.")
+    st.write(f"Error details: {e}")
+    model = None
 
 
 class_indices = train_generator.class_indices
