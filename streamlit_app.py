@@ -66,6 +66,7 @@ else:
 model_path = 'tulu_character_recognition_model2.h5'
 model_url = 'https://github.com/dee2003/Varnamitra-Tulu-word-translation/releases/download/v1.0/tulu_character_recognition_model2.h5'
 
+
 # Check if model exists, otherwise download
 try:
     # Check if the model file exists before trying to load
