@@ -8,3 +8,4 @@ openpyxl
 pyttsx3
 gtts
 requests
+h5py
