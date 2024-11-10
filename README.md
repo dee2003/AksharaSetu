@@ -1,4 +1,4 @@
-# Tulu Handwritten Character Recognition and Translation (OCR)
+# AksharaSetu: The Character Bridge Between Tulu and Kannada  
 Tulu, a Dravidian language, has recently been assigned a Unicode standard but lacks system-wide support. This project aims to develop a Tulu OCR system that recognizes handwritten Tulu characters and translates them into their corresponding Kannada characters.
 
 ### The project includes:
